@@ -9,9 +9,9 @@
 <style>
   :root{
     /* identidade CB00 Marketing — preto carbono, prata e vermelho racing */
-    --vt-teal-d:#0B0C0E; --vt-teal-d2:#000000; --vt-teal:#C1121F; --vt-teal-l:#9EA6AB;
+    --vt-teal-d:#0B0C0E; --vt-teal-d2:#000000; --vt-teal:#0E6E63; --vt-teal-l:#9EA6AB;
     --vt-cream:#F4F4F5; --vt-cream2:#E0E2E4;
-    --aereo:#7F8C8D; --hotelvegas:#C9912E; --motorhome:#C1121F; --hotelmeio:#2E86AB; --orlando:#0B0C0E;
+    --aereo:#7F8C8D; --hotelvegas:#C9912E; --motorhome:#0E6E63; --hotelmeio:#2E86AB; --orlando:#0B0C0E;
     --ink:#1f2933; --bg:#f4f4f5;
   }
   *{box-sizing:border-box;}
@@ -24,6 +24,10 @@
   .head-txt h1{margin:0 0 5px;font-size:20px;letter-spacing:.2px;}
   .head-txt .sub{margin:0;font-size:13px;color:var(--vt-teal-l);font-weight:600;}
   .head-txt .sub2{margin:3px 0 0;font-size:12px;opacity:.85;}
+  .head-client{margin-left:auto;display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0;}
+  .head-client span{font-size:9.5px;letter-spacing:1.6px;text-transform:uppercase;color:var(--vt-teal-l);font-weight:700;}
+  .head-client .chip{background:#fff;border-radius:10px;padding:9px 16px;box-shadow:0 2px 10px rgba(0,0,0,.35);}
+  .head-client .chip img{height:24px;display:block;}
 
   .wrap{max-width:1200px;margin:0 auto;padding:18px;}
 
@@ -157,6 +161,7 @@
   @media(max-width:640px){
     .head-inner{flex-direction:column;align-items:flex-start;gap:10px;}
     .head-logo{width:170px;}
+    .head-client{margin-left:0;flex-direction:row;align-items:center;}
     .controls{justify-content:center;}
   }
 </style>
@@ -169,6 +174,10 @@
       <h1>🏁 PneuStore — NASCAR Weekend Las Vegas 2026</h1>
       <p class="sub">CB00 MARKETING · EXPERIÊNCIA OFICIAL</p>
       <p class="sub2" id="verSub">Viagem corporativa · 02 a 05/10/2026 · 17 convidados + 2 staff · NASCAR Cup Series Playoffs — Las Vegas Motor Speedway</p>
+    </div>
+    <div class="head-client">
+      <span>Experiência para</span>
+      <div class="chip"><img src="pneustore_logo.png" alt="PneuStore" /></div>
     </div>
   </div>
 </header>
@@ -331,7 +340,7 @@
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-const cores = { aereo:'#7F8C8D', hotelvegas:'#C9912E', motorhome:'#C1121F', hotelmeio:'#2E86AB', orlando:'#0B0C0E' };
+const cores = { aereo:'#7F8C8D', hotelvegas:'#C9912E', motorhome:'#0E6E63', hotelmeio:'#2E86AB', orlando:'#0B0C0E' };
 
 /* ===== Descrições detalhadas de cada momento ===== */
 const descricoes = {
