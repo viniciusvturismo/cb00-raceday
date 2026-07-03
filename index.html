@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CB00 · PneuStore — NASCAR Weekend Las Vegas 2026</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+  :root{
+    /* identidade CB00 Marketing — preto carbono, prata e vermelho racing */
+    --vt-teal-d:#0B0C0E; --vt-teal-d2:#000000; --vt-teal:#C1121F; --vt-teal-l:#9EA6AB;
+    --vt-cream:#F4F4F5; --vt-cream2:#E0E2E4;
+    --aereo:#7F8C8D; --hotelvegas:#C9912E; --motorhome:#C1121F; --hotelmeio:#2E86AB; --orlando:#0B0C0E;
+    --ink:#1f2933; --bg:#f4f4f5;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);background:var(--bg);}
+
+  header{background:linear-gradient(135deg,#1A1C1F,var(--vt-teal-d2));color:#fff;padding:20px 26px 32px;border-bottom:0;position:relative;}
+  header::after{content:"";position:absolute;left:0;right:0;bottom:0;height:12px;background:repeating-conic-gradient(#0B0C0E 0% 25%, #fff 0% 50%) 0 0/12px 12px;}
+  .head-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:18px;}
+  .head-logo{flex-shrink:0;width:210px;height:auto;}
+  .head-txt h1{margin:0 0 5px;font-size:20px;letter-spacing:.2px;}
+  .head-txt .sub{margin:0;font-size:13px;color:var(--vt-teal-l);font-weight:600;}
+  .head-txt .sub2{margin:3px 0 0;font-size:12px;opacity:.85;}
+
+  .wrap{max-width:1200px;margin:0 auto;padding:18px;}
+
+  .controls{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;}
+  .fases{display:flex;flex-wrap:wrap;gap:8px;font-size:12px;}
+  .fase{display:inline-flex;align-items:center;gap:7px;background:#fff;border:1px solid var(--vt-cream2);border-radius:24px;padding:6px 13px;box-shadow:0 2px 8px rgba(12,72,64,.06);}
+  .fase b{color:var(--vt-teal-d);}
+  .fase i{width:10px;height:10px;border-radius:50%;display:inline-block;}
+  .wa-share{display:inline-flex;align-items:center;gap:8px;background:#25D366;color:#fff;text-decoration:none;font-size:13px;font-weight:700;padding:9px 16px;border-radius:24px;box-shadow:0 2px 8px rgba(37,211,102,.3);transition:.15s;}
+  .wa-share:hover{background:#1da851;}
+  .wa-share svg{width:16px;height:16px;fill:#fff;}
+
+  #map{height:66vh;min-height:480px;width:100%;border-radius:14px;box-shadow:0 6px 22px rgba(12,72,64,.18);border:1px solid var(--vt-cream2);}
+
+  .ver-resumo{font-size:12.5px;color:var(--vt-teal-d);background:#fff;border:1px solid var(--vt-cream2);border-radius:8px;padding:9px 13px;margin:12px 0 0;}
+  .ver-resumo b{color:var(--vt-teal);}
+
+  .milhagem{display:flex;flex-wrap:wrap;align-items:center;gap:16px;background:linear-gradient(135deg,var(--vt-teal),var(--vt-teal-d));color:#fff;border-radius:12px;padding:14px 18px;margin:12px 0 0;box-shadow:0 4px 16px rgba(12,72,64,.18);}
+  .milhagem .mi-num{font-size:26px;font-weight:800;line-height:1;letter-spacing:.5px;}
+  .milhagem .mi-num small{font-size:13px;font-weight:600;opacity:.85;margin-left:6px;}
+  .milhagem .mi-label{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--vt-teal-l);font-weight:700;}
+  .milhagem .mi-sep{width:1px;align-self:stretch;background:rgba(255,255,255,.25);}
+  .milhagem .mi-obs{font-size:11.5px;line-height:1.5;opacity:.92;flex:1;min-width:200px;}
+  .milhagem .mi-obs b{color:#fff;}
+
+  /* ===== Proposta comercial ===== */
+  .proposta{background:#fff;border:1px solid var(--vt-cream2);border-radius:14px;overflow:hidden;box-shadow:0 8px 26px rgba(12,72,64,.14);}
+  .proposta-head{background:linear-gradient(135deg,var(--vt-teal-d),var(--vt-teal-d2));color:#fff;padding:18px 22px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;}
+  .proposta-head h3{margin:0;font-size:19px;}
+  .proposta-head p{margin:4px 0 0;font-size:12.5px;color:var(--vt-teal-l);}
+  .proposta-head .pp-selo{background:var(--vt-teal-l);color:#06231f;font-size:11px;font-weight:800;letter-spacing:1px;padding:5px 12px;border-radius:20px;text-transform:uppercase;}
+  .pp-group{padding:11px 22px 5px;font-size:11.5px;font-weight:700;color:var(--vt-teal-d);text-transform:uppercase;letter-spacing:.6px;background:var(--vt-cream);border-top:1px solid var(--vt-cream2);}
+  .pp-row{display:flex;justify-content:space-between;gap:12px;padding:9px 22px;font-size:13px;border-bottom:1px solid #f0f3f1;}
+  .pp-row .pp-item{color:#28332f;}
+  .pp-row .pp-item small{display:block;color:#7b8c86;font-size:11px;margin-top:1px;}
+  .pp-row .pp-val{font-weight:700;color:var(--vt-teal-d);white-space:nowrap;}
+  .pp-sob{color:#9a7b2e !important;font-weight:700;font-style:italic;font-size:12px;}
+  .pp-incluido{color:var(--vt-teal) !important;font-weight:800;font-size:12px;}
+  .pp-cotar-nota{padding:9px 22px;font-size:11px;color:#9a7b2e;background:#fffdf4;border-bottom:1px solid #f0f3f1;}
+  .pp-total{padding:24px 22px;background:linear-gradient(135deg,var(--vt-teal),var(--vt-teal-d));color:#fff;}
+  .pp-incl{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--vt-cream2);}
+  .pp-incl > div{padding:14px 22px;font-size:12px;line-height:1.75;}
+  .pp-incl .inc{background:#f2f3f4;}
+  .pp-incl .exc{background:#fbf3f2;border-left:1px solid var(--vt-cream2);}
+  .pp-incl b{display:block;margin-bottom:5px;color:var(--vt-teal-d);}
+  .pp-incl .exc b{color:#9a4a3c;}
+  .pp-cta{padding:18px 22px;text-align:center;border-top:1px solid var(--vt-cream2);}
+  .pp-foot{padding:0 22px 16px;font-size:10.5px;color:#9aa6a1;text-align:center;}
+  @media(max-width:560px){ .pp-incl{grid-template-columns:1fr;} .pp-incl .exc{border-left:none;border-top:1px solid var(--vt-cream2);} }
+
+  .legend-bar{display:flex;flex-wrap:wrap;gap:14px;margin:14px 0 6px;font-size:13px;}
+  .legend-bar span{display:inline-flex;align-items:center;gap:7px;}
+  .dot{width:14px;height:14px;border-radius:50%;display:inline-block;border:2px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.18);}
+  .line{width:26px;height:4px;border-radius:3px;display:inline-block;}
+
+  .note{font-size:12.5px;color:#3a4a44;background:var(--vt-cream);border-left:4px solid var(--vt-teal-l);padding:13px 15px;border-radius:8px;margin:14px 0 4px;}
+  .note strong{color:var(--vt-teal-d);}
+
+  h2{font-size:17px;margin:26px 0 10px;color:var(--vt-teal-d);display:flex;align-items:center;gap:9px;}
+  h2::before{content:"";width:22px;height:3px;background:var(--vt-teal);border-radius:2px;display:inline-block;}
+
+  table{width:100%;border-collapse:collapse;font-size:12.5px;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 16px rgba(12,72,64,.10);}
+  th,td{padding:9px 10px;text-align:left;border-bottom:1px solid #e6ebe7;vertical-align:top;}
+  th{background:var(--vt-teal-d);color:var(--vt-cream);font-weight:600;position:sticky;top:0;}
+  tr:nth-child(even) td{background:#fafbfa;}
+  tr:hover td{background:#f0f1f2;}
+  tr.linha-orlando td{background:#ececee;}
+
+  .tag{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10.5px;font-weight:700;color:#fff;white-space:nowrap;}
+  .t-aereo{background:var(--aereo);}
+  .t-hotel{background:var(--hotelvegas);}
+  .t-rv{background:var(--motorhome);}
+  .t-hotelmeio{background:var(--hotelmeio);}
+  .t-orlando{background:var(--orlando);}
+
+  .marker-num{color:#fff;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;border:2px solid #fff;box-shadow:0 1px 5px rgba(0,0,0,.4);}
+  .pop b{font-size:13px;color:var(--vt-teal-d);}
+  .pop small{color:#52605a;}
+  .pop-link{display:inline-block;margin-top:6px;color:var(--vt-teal);font-weight:700;font-size:11.5px;text-decoration:none;}
+  .pop-link:hover{text-decoration:underline;}
+  .cell-link{color:var(--vt-teal-d);text-decoration:none;font-weight:600;border-bottom:1px dotted var(--vt-teal-l);cursor:pointer;}
+  .cell-link:hover{color:var(--vt-teal);}
+
+  /* ===== Modal de descrição do ponto ===== */
+  .modal{position:fixed;inset:0;z-index:2000;background:rgba(7,43,39,.55);display:none;align-items:center;justify-content:center;padding:18px;}
+  .modal.open{display:flex;}
+  .modal-box{background:#fff;max-width:560px;width:100%;max-height:86vh;overflow:auto;border-radius:14px;box-shadow:0 18px 50px rgba(0,0,0,.35);position:relative;border-top:5px solid var(--vt-teal);}
+  .modal-x{position:absolute;right:12px;top:10px;border:none;background:var(--vt-cream);color:var(--vt-teal-d);width:30px;height:30px;border-radius:50%;font-size:18px;cursor:pointer;line-height:1;}
+  .modal-x:hover{background:var(--vt-cream2);}
+  .modal-box .md-inner{padding:22px 24px;}
+  .modal-box h3{margin:6px 0 6px;color:var(--vt-teal-d);font-size:19px;}
+  .md-meta{font-size:12px;color:#52605a;margin:0 0 12px;line-height:1.6;}
+  .md-desc{font-size:13.5px;line-height:1.65;color:#28332f;}
+  .md-desc b{color:var(--vt-teal-d);}
+  .md-hosp{margin-top:14px;font-size:12px;background:var(--vt-cream);border-radius:8px;padding:9px 12px;color:#3a4a44;}
+  .md-hosp b{color:var(--vt-teal-d);}
+  .md-galeria-tit{margin:18px 0 8px;font-size:13px;font-weight:700;color:var(--vt-teal-d);display:flex;align-items:center;gap:8px;}
+  .md-galeria-tit::before{content:"";width:18px;height:3px;background:var(--vt-teal-l);border-radius:2px;}
+  .md-galeria{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
+  .md-galeria figure{margin:0;border:1px solid var(--vt-cream2);border-radius:10px;overflow:hidden;background:#fff;box-shadow:0 2px 8px rgba(12,72,64,.07);}
+  .md-galeria img{width:100%;height:120px;object-fit:cover;display:block;background:var(--vt-cream);}
+  .md-galeria figcaption{padding:8px 10px;}
+  .md-galeria figcaption b{display:block;font-size:12px;color:var(--vt-teal-d);}
+  .md-galeria figcaption span{display:block;font-size:10.5px;color:#52605a;line-height:1.35;margin-top:2px;}
+  @media(max-width:520px){ .md-galeria{grid-template-columns:1fr;} }
+
+  /* ===== Lightbox / carrossel ===== */
+  .lightbox{position:fixed;inset:0;z-index:3000;background:rgba(4,20,18,.92);display:none;align-items:center;justify-content:center;}
+  .lightbox.open{display:flex;}
+  .lb-stage{margin:0;max-width:92vw;max-height:92vh;display:flex;flex-direction:column;align-items:center;}
+  .lb-stage img{max-width:92vw;max-height:78vh;border-radius:10px;box-shadow:0 14px 50px rgba(0,0,0,.6);object-fit:contain;background:#0b3d38;}
+  .lb-cap{margin-top:14px;text-align:center;max-width:760px;color:#fff;}
+  .lb-cap b{display:block;font-size:16px;color:#fff;}
+  .lb-cap span{display:block;font-size:12.5px;color:var(--vt-teal-l);margin-top:3px;}
+  .lb-count{margin-top:8px;font-size:11px;color:rgba(255,255,255,.6);letter-spacing:1px;}
+  .lb-close{position:absolute;top:16px;right:20px;width:42px;height:42px;border:none;border-radius:50%;background:rgba(255,255,255,.14);color:#fff;font-size:24px;cursor:pointer;line-height:1;}
+  .lb-close:hover{background:rgba(255,255,255,.28);}
+  .lb-nav{position:absolute;top:50%;transform:translateY(-50%);width:52px;height:52px;border:none;border-radius:50%;background:rgba(255,255,255,.14);color:#fff;font-size:30px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;}
+  .lb-nav:hover{background:var(--vt-teal);}
+  .lb-prev{left:18px;} .lb-next{right:18px;}
+  @media(max-width:600px){ .lb-nav{width:42px;height:42px;font-size:24px;} .lb-prev{left:8px;} .lb-next{right:8px;} .lb-stage img{max-height:70vh;} }
+
+  .table-scroll{overflow-x:auto;border-radius:12px;}
+
+  footer{background:var(--vt-teal-d);color:var(--vt-cream);margin-top:30px;padding:22px 26px;border-top:4px solid var(--vt-teal-l);}
+  .foot-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+  .foot-logo{width:150px;height:auto;flex-shrink:0;}
+  .foot-txt{font-size:11.5px;line-height:1.6;opacity:.9;}
+  .foot-txt b{color:var(--vt-teal-l);}
+
+  @media(max-width:640px){
+    .head-inner{flex-direction:column;align-items:flex-start;gap:10px;}
+    .head-logo{width:170px;}
+    .controls{justify-content:center;}
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="head-inner">
+    <img class="head-logo" src="cb00_branco.png" alt="CB00 Marketing" />
+    <div class="head-txt">
+      <h1>🏁 PneuStore — NASCAR Weekend Las Vegas 2026</h1>
+      <p class="sub">CB00 MARKETING · EXPERIÊNCIA OFICIAL</p>
+      <p class="sub2" id="verSub">Viagem corporativa · 02 a 05/10/2026 · 17 convidados + 2 staff · NASCAR Cup Series Playoffs — Las Vegas Motor Speedway</p>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="controls">
+    <div class="fases">
+      <span class="fase"><i style="background:var(--hotelvegas)"></i> <b>Sex 02/10</b> Chegada + Welcome Dinner</span>
+      <span class="fase"><i style="background:var(--motorhome)"></i> <b>Sáb 03/10</b> Experiências Signature</span>
+      <span class="fase"><i style="background:var(--orlando)"></i> <b>Dom 04/10</b> NASCAR Race Day</span>
+      <span class="fase"><i style="background:var(--aereo)"></i> <b>Seg 05/10</b> Partida</span>
+    </div>
+    <a class="wa-share" id="waShare" href="#" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.946C.16 5.335 5.495 0 12.057 0a11.82 11.82 0 018.413 3.488 11.82 11.82 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 001.51 5.26l-.999 3.648 3.728-.97zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+      Compartilhar no WhatsApp
+    </a>
+  </div>
+
+  <div id="map"></div>
+
+  <div class="ver-resumo" id="verResumo"></div>
+
+  <div class="milhagem">
+    <div>
+      <div class="mi-label">Transporte Executivo</div>
+      <div class="mi-num">100% <small>da programação coberta</small></div>
+    </div>
+    <div class="mi-sep"></div>
+    <div class="mi-obs">
+      Operação completa de transporte terrestre durante toda a experiência: <b>Airport Meet &amp; Greet</b>, <b>Transfer In/Out</b>, deslocamentos para toda a programação e <b>Race Day Transfers</b> Hotel ⇄ Speedway — veículos executivos, com pontualidade, conforto e segurança, além de <b>concierge dedicado</b> e acompanhamento operacional durante toda a experiência.
+    </div>
+  </div>
+
+  <div class="legend-bar">
+    <span><i class="dot" style="background:var(--aereo)"></i> Chegada / Partida (aeroporto)</span>
+    <span><i class="dot" style="background:var(--hotelvegas)"></i> Hospedagem Premium</span>
+    <span><i class="dot" style="background:var(--hotelmeio)"></i> Gastronomia &amp; Noite</span>
+    <span><i class="dot" style="background:var(--motorhome)"></i> Experiências Signature</span>
+    <span><i class="dot" style="background:var(--orlando)"></i> NASCAR Race Day</span>
+    <span><i class="line" style="background:var(--motorhome)"></i> Transporte executivo</span>
+  </div>
+
+  <div class="note">
+    <strong>O conceito da experiência:</strong> um fim de semana completo em Las Vegas, desenhado para o público convidado da PneuStore — hospedagem de alto padrão no <strong>Fontainebleau Las Vegas</strong>, experiências exclusivas conectadas ao universo automotivo e a operação completa do <strong>NASCAR Race Day</strong>, com transporte executivo e concierge dedicado do início ao fim. <em>O camarote NASCAR e os respectivos ingressos serão disponibilizados pela PneuStore.</em>
+  </div>
+
+  <h2 id="tabTitulo">Programação completa</h2>
+  <div class="table-scroll">
+  <table id="roteiro">
+    <thead>
+      <tr>
+        <th>#</th><th>Data</th><th>Dia</th><th>Momento / Local</th><th>Tipo</th>
+        <th>Período</th><th>Transfer</th><th>Pernoite</th><th>Observações</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+  </div>
+
+  <h2>💼 Proposta de Experiência</h2>
+  <div class="proposta">
+    <div class="proposta-head">
+      <div>
+        <h3>PneuStore — NASCAR Weekend Las Vegas 2026</h3>
+        <p>02 a 05/10/2026 · 17 convidados + 2 staff · experiência corporativa completa CB00 Marketing</p>
+      </div>
+      <span class="pp-selo">Proposta</span>
+    </div>
+
+    <div class="pp-group">🏨 Hospedagem Premium</div>
+    <div class="pp-row"><span class="pp-item">Fontainebleau Las Vegas — 3 noites<small>Recomendação VTurismo · alto padrão, gastronomia e logística ideais para o grupo · Alternativas: Wynn · ARIA · Encore · Crockfords</small></span><span class="pp-val pp-sob">sob consulta</span></div>
+
+    <div class="pp-group">🚐 Transporte Executivo</div>
+    <div class="pp-row"><span class="pp-item">Operação completa de transporte terrestre<small>Airport Meet &amp; Greet · Transfer In · deslocamentos de toda a programação · Race Day Transfers · Transfer Out</small></span><span class="pp-val pp-sob">sob consulta</span></div>
+
+    <div class="pp-group">🍽 Gastronomia</div>
+    <div class="pp-row"><span class="pp-item">Welcome Dinner — Ocean Prime<small>Jantar de boas-vindas e integração do grupo · Alternativas: Carbone · Delilah · SW Steakhouse</small></span><span class="pp-val pp-sob">sob consulta</span></div>
+    <div class="pp-row"><span class="pp-item">Beyond the Finish Line — Barry's Downtown Prime<small>Jantar de encerramento do Race Day · Alternativas: Carbone · Ocean Prime · Delilah</small></span><span class="pp-val pp-sob">sob consulta</span></div>
+    <div class="pp-row"><span class="pp-item">Hidden Vegas Experience — The Laundry Room<small>Speakeasy exclusivo para o fechamento da noite · Alternativas: The Vault · Easy's Cocktail Lounge</small></span><span class="pp-val pp-sob">sob consulta</span></div>
+
+    <div class="pp-group">🏜 Experiências Signature</div>
+    <div class="pp-row"><span class="pp-item">Desert Off-Road Experience<small>UTVs pelo deserto de Nevada, com operadores especializados · Alternativas: Sphere · Exotics Racing · Shelby American · Highlights Tour</small></span><span class="pp-val pp-sob">sob consulta</span></div>
+    <div class="pp-row"><span class="pp-item">Las Vegas Night Flight — helicóptero 🚁<small>Sobrevoo panorâmico da Strip iluminada</small></span><span class="pp-val pp-sob">sob consulta</span></div>
+    <div class="pp-row"><span class="pp-item">Espetáculo Premium — "O" · Cirque du Soleil (Bellagio)<small>Alternativas: KÀ · Mystère · Mad Apple</small></span><span class="pp-val pp-sob">sob consulta</span></div>
+
+    <div class="pp-group">🏁 NASCAR Race Day Operations</div>
+    <div class="pp-row"><span class="pp-item">Coordenação completa do dia da corrida<small>Briefing · transporte executivo Hotel ⇄ Speedway · concierge dedicado · acompanhamento operacional · coordenação do retorno e pós-corrida</small></span><span class="pp-val pp-sob">sob consulta</span></div>
+    <div class="pp-row"><span class="pp-item">Camarote NASCAR + ingressos<small>Disponibilizados pela PneuStore</small></span><span class="pp-val pp-incluido">PneuStore</span></div>
+
+    <div class="pp-group">📱 Plataforma Digital</div>
+    <div class="pp-row"><span class="pp-item">PneuStore Experience App<small>Plataforma exclusiva com toda a experiência centralizada: programação, avisos, transfers e concierge</small></span><span class="pp-val pp-incluido">incluído</span></div>
+
+    <div class="pp-cotar-nota">Os investimentos serão consolidados após a confirmação do hotel, das experiências escolhidas e do número final de participantes — cada bloco acima é cotado individualmente para o grupo de 17 convidados + 2 staff.</div>
+
+    <div class="pp-total">
+      <div style="text-align:center;font-size:14px;font-weight:800;letter-spacing:1px;margin-bottom:12px;">INVESTIMENTO SOB CONSULTA</div>
+      <div style="text-align:center;font-size:12.5px;opacity:.92;max-width:720px;margin:0 auto;line-height:1.7;">
+        Esta é a <b>proposta de experiência</b> — o desenho completo do NASCAR Weekend da PneuStore.
+        Após a validação do conceito e das escolhas (hotel, experiências e restaurantes), a CB00 apresenta a <b>proposta comercial consolidada</b>, por participante e total do grupo.
+      </div>
+    </div>
+
+    <div class="pp-incl">
+      <div class="inc">
+        <b>✅ Escopo da experiência</b>
+        Hospedagem premium — 3 noites (02–05/10)<br>
+        Transporte executivo durante toda a experiência<br>
+        Welcome Dinner + jantar Beyond the Finish Line + Speakeasy<br>
+        Desert Off-Road Experience · Night Flight 🚁 · Espetáculo Premium<br>
+        Operação completa do NASCAR Race Day com concierge dedicado<br>
+        PneuStore Experience App (central digital do participante)
+      </div>
+      <div class="exc">
+        <b>❌ Fora do escopo</b>
+        Aéreo Brasil ⇄ Las Vegas (cotado à parte, sob demanda)<br>
+        Camarote e ingressos NASCAR (disponibilizados pela PneuStore)<br>
+        Refeições fora da programação, extras e despesas pessoais<br>
+        Gorjetas e gastos de caráter individual
+      </div>
+    </div>
+
+    <div class="pp-cta">
+      <a class="wa-share" id="waProposta" href="#" target="_blank" rel="noopener" style="font-size:14px;padding:11px 22px">💬 Quero avançar com esta experiência</a>
+    </div>
+    <div class="pp-foot">
+      Programação sujeita a ajustes conforme a agenda oficial da NASCAR e disponibilidade dos fornecedores na data da confirmação. · CB00 Marketing · Operação e logística: VTurismo — agência parceira.
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <div class="foot-inner">
+    <img class="foot-logo" src="cb00_branco.png" alt="CB00 Marketing" />
+    <div class="foot-txt">
+      <b>CB00 MARKETING — a agência de Cacá Bueno.</b><br>
+      Experiência corporativa desenhada e organizada pela CB00 · NASCAR Weekend Las Vegas 2026 · PneuStore. Horários e locais sujeitos a confirmação conforme agenda oficial da corrida e disponibilidade. · Material de apresentação — valores sob consulta.<br>
+      Operação e logística de viagem: <b>VTurismo — agência parceira</b> · 📞 WhatsApp <b>(21) 4145-2310</b>
+    </div>
+  </div>
+</footer>
+
+<div class="modal" id="descModal" onclick="if(event.target===this)closeDesc()">
+  <div class="modal-box">
+    <button class="modal-x" onclick="closeDesc()" aria-label="Fechar">×</button>
+    <div class="md-inner" id="descContent"></div>
+  </div>
+</div>
+
+<div class="lightbox" id="lightbox" onclick="if(event.target===this)closeLb()">
+  <button class="lb-close" onclick="closeLb()" aria-label="Fechar">×</button>
+  <button class="lb-nav lb-prev" onclick="lbStep(-1)" aria-label="Anterior">‹</button>
+  <figure class="lb-stage" onclick="if(event.target===this)closeLb()">
+    <img id="lbImg" src="" alt="">
+    <figcaption class="lb-cap" id="lbCap"></figcaption>
+    <span class="lb-count" id="lbCount"></span>
+  </figure>
+  <button class="lb-nav lb-next" onclick="lbStep(1)" aria-label="Próxima">›</button>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const cores = { aereo:'#7F8C8D', hotelvegas:'#C9912E', motorhome:'#C1121F', hotelmeio:'#2E86AB', orlando:'#0B0C0E' };
+
+/* ===== Descrições detalhadas de cada momento ===== */
+const descricoes = {
+ 1:'Recepção do grupo no <b>Harry Reid International Airport (LAS)</b> com <b>Airport Meet &amp; Greet</b>: equipe aguardando no desembarque, apoio com bagagens e embarque imediato nos veículos executivos. <b>Transfer In</b> direto para o hotel, com briefing de boas-vindas da experiência no trajeto.',
+ 2:'Nossa recomendação de hospedagem: o <b>Fontainebleau Las Vegas</b> — o resort mais novo e sofisticado da Strip (67 andares), com gastronomia de excelência, spa premiado e localização estratégica para toda a logística da programação. <b>Alternativas de igual padrão:</b> Wynn Las Vegas · ARIA Resort · Encore · Crockfords Las Vegas.',
+ 3:'<b>Welcome Dinner</b> no <b>Ocean Prime</b> — jantar de boas-vindas em restaurante de alto padrão, com ambiente ideal para a integração do grupo: frutos do mar e steaks premiados com vista para a Strip. <b>Alternativas:</b> Carbone · Delilah · SW Steakhouse.',
+ 4:'<b>Desert Off-Road Experience</b> — a Signature Experience do grupo: aventura em veículos <b>UTV</b> pelo deserto de Nevada, conduzida por operadores especializados e conectada ao universo automotivo da NASCAR. Adrenalina, paisagens do Mojave e espírito de equipe. <b>Experiências alternativas:</b> Sphere Experience · Exotics Racing · Shelby American · Las Vegas Highlights Tour.',
+ 5:'<b>Las Vegas Night Flight</b> — sobrevoo panorâmico de <b>helicóptero</b> pela Strip iluminada ao anoitecer: Bellagio, Caesars, Sphere e o letreiro de Las Vegas vistos do alto. Uma das experiências mais emblemáticas e inesquecíveis da cidade.',
+ 6:'<b>Espetáculo Premium</b> — nossa recomendação é <b>"O", do Cirque du Soleil</b>, no teatro aquático do Bellagio: o espetáculo mais icônico de Las Vegas, com acrobacias em um palco de 5,7 milhões de litros d\'água. <b>Alternativas:</b> KÀ · Mystère · Mad Apple.',
+ 7:'<b>NASCAR Race Day</b> no <b>Las Vegas Motor Speedway</b> — o ponto alto da viagem: corrida dos <b>Playoffs da NASCAR Cup Series</b>. Operação completa VTurismo: briefing da programação, transporte executivo Hotel ⇄ Speedway, <b>concierge dedicado</b>, acompanhamento operacional durante toda a experiência e coordenação do retorno. <em>Camarote e ingressos disponibilizados pela PneuStore.</em>',
+ 8:'<b>Beyond the Finish Line</b> — jantar de encerramento do Race Day no <b>Barry\'s Downtown Prime</b> (Circa Resort), steakhouse premium da nova Downtown Las Vegas, celebrando a experiência vivida pelo grupo. <b>Alternativas:</b> Carbone · Ocean Prime · Delilah.',
+ 9:'<b>Hidden Vegas Experience</b> — encerramento da noite no <b>The Laundry Room</b>, speakeasy escondido dentro do Commonwealth (Fremont East): coquetelaria autoral em um ambiente exclusivo, sofisticado e pouco conhecido da vida noturna de Las Vegas. <b>Alternativas:</b> The Vault · Easy\'s Cocktail Lounge.',
+ 10:'<b>Transfer Out</b> — deslocamento executivo do hotel ao <b>Harry Reid International Airport (LAS)</b>, com apoio da equipe até o check-in. Encerramento da experiência NASCAR Weekend PneuStore.',
+};
+
+/* ===== Atrativos (com fotos reais) por grupo ===== */
+const A = (img,nome,desc)=>({img:'img/'+img,nome,desc});
+const grupos = {
+  chegada:[ A('welcome_sign.jpg','Welcome to Las Vegas','O letreiro icônico dá as boas-vindas ao grupo PneuStore.'),
+       A('strip.jpg','Las Vegas Strip','A avenida mais famosa do mundo — palco da experiência.'),
+       A('aeroporto.jpg','Harry Reid Intl. (LAS)','Recepção Meet & Greet no desembarque.') ],
+  hotel:[ A('fontainebleau.jpg','Fontainebleau Las Vegas','O resort mais novo e sofisticado da Strip — recomendação VTurismo.'),
+       A('wynn.jpg','Wynn Las Vegas','Alternativa: elegância clássica cinco estrelas.'),
+       A('aria.jpg','ARIA Resort','Alternativa: design contemporâneo no coração da Strip.') ],
+  gastro:[ A('vegas_night.jpg','Alta gastronomia na Strip','Restaurantes de alto padrão para a integração do grupo.'),
+       A('strip.jpg','Las Vegas Boulevard','O cenário do Welcome Dinner.') ],
+  offroad:[ A('utv.jpg','UTV Off-Road','Aventura em UTVs pelas dunas do deserto de Nevada.'),
+       A('desert_nv.jpg','Deserto de Nevada','As paisagens do Mojave — o playground da experiência.'),
+       A('sphere.jpg','Sphere','Experiência alternativa: o venue mais futurista do mundo.') ],
+  heli:[ A('heli.jpg','A Strip vista do alto','O sobrevoo noturno — a visão mais emblemática de Las Vegas.'),
+       A('vegas_night.jpg','Las Vegas à noite','Milhões de luzes: o cenário do Night Flight.') ],
+  show:[ A('o_bellagio.jpg','Bellagio','A casa do "O" — Cirque du Soleil, com as fontes dançantes.'),
+       A('bellagio_fountains.jpg','Fountains of Bellagio','O espetáculo de águas na porta do teatro.') ],
+  nascar:[ A('nascar_race.jpg','NASCAR em Las Vegas','O Speedway lotado em dia de corrida da Cup Series.'),
+       A('speedway.jpg','Las Vegas Motor Speedway','O tri-oval de 1,5 milha, casa dos Playoffs.'),
+       A('nascar_pit.jpg','Pit Stop','A precisão dos boxes — o universo que conecta PneuStore e NASCAR.') ],
+  downtown:[ A('fremont.jpg','Fremont Street','A velha Las Vegas — cenário da noite de encerramento.'),
+       A('vegas_night.jpg','Downtown à noite','A energia da cidade que nunca dorme.') ],
+  partida:[ A('welcome_sign.jpg','Até a próxima, Las Vegas','Fim de semana inesquecível — até a próxima experiência.') ],
+};
+const atrativos = {
+  1:grupos.chegada, 2:grupos.hotel, 3:grupos.gastro, 4:grupos.offroad, 5:grupos.heli,
+  6:grupos.show, 7:grupos.nascar, 8:grupos.downtown, 9:grupos.downtown, 10:grupos.partida,
+};
+function galeriaHTML(n){
+  const lista = atrativos[n]; if(!lista) return '';
+  const cards = lista.map((a,i)=>
+    `<figure><img src="${a.img}" alt="${a.nome}" loading="lazy" style="cursor:zoom-in" onclick="openCarousel('${n}',${i})" onerror="this.parentNode.style.display='none'">`+
+    `<figcaption><b>${a.nome}</b><span>${a.desc}</span></figcaption></figure>`).join('');
+  return `<div class="md-galeria-tit">📸 A experiência em imagens <span style="font-weight:400;color:#7b8c86;font-size:11px">(clique para ampliar)</span></div><div class="md-galeria">${cards}</div>`;
+}
+
+/* ===== Carrossel / Lightbox ===== */
+let lbList=[], lbIdx=0;
+function openCarousel(n, i){
+  lbList = atrativos[n] || []; if(!lbList.length) return;
+  lbIdx = i||0; lbRender();
+  document.getElementById('lightbox').classList.add('open');
+}
+function lbRender(){
+  const a=lbList[lbIdx];
+  const img=document.getElementById('lbImg');
+  img.src=a.img; img.alt=a.nome;
+  document.getElementById('lbCap').innerHTML=`<b>${a.nome}</b><span>${a.desc}</span>`;
+  document.getElementById('lbCount').textContent=(lbIdx+1)+' / '+lbList.length;
+  const multi=lbList.length>1;
+  document.querySelectorAll('.lb-nav').forEach(b=>b.style.display=multi?'flex':'none');
+}
+function lbStep(d){ lbIdx=(lbIdx+d+lbList.length)%lbList.length; lbRender(); }
+function closeLb(){ document.getElementById('lightbox').classList.remove('open'); }
+
+function openDesc(n){
+  const p = pontos.find(x=>x.n===n); if(!p) return;
+  document.getElementById('descContent').innerHTML =
+    `<span class="tag ${p.tagCls}" style="margin-bottom:4px">${p.tagTxt}</span>`+
+    `<h3>${p.cidade}</h3>`+
+    `<p class="md-meta">📅 ${p.data} · ${p.dia}`+
+      (p.tempo!=='—'?` &nbsp;·&nbsp; 🕑 ${p.tempo}`:'')+
+      (p.km!=='—'?` &nbsp;·&nbsp; 🚐 ${p.km}`:'')+`</p>`+
+    `<div class="md-desc">${descricoes[n]||p.obs}</div>`+
+    `<div class="md-hosp">🛏️ <b>Pernoite:</b> ${p.pernoite}<br>🏨 <b>Hospedagem:</b> ${p.hosp}</div>`+
+    galeriaHTML(n);
+  document.getElementById('descModal').classList.add('open');
+}
+function closeDesc(){ document.getElementById('descModal').classList.remove('open'); }
+document.addEventListener('keydown', e=>{
+  const lbOpen = document.getElementById('lightbox').classList.contains('open');
+  if(lbOpen){
+    if(e.key==='Escape') closeLb();
+    else if(e.key==='ArrowRight') lbStep(1);
+    else if(e.key==='ArrowLeft') lbStep(-1);
+    return;
+  }
+  if(e.key==='Escape') closeDesc();
+});
+
+/* tempo = período/horário sugerido · km = tempo de transfer aprox. */
+const pontos = [
+  { n:1, data:'02/10', dia:'Sex', cidade:'Chegada — Harry Reid Intl. (LAS)', lat:36.0840, lng:-115.1537,
+    tipo:'aereo', tagTxt:'Chegada', tagCls:'t-aereo', modal:'✈️→🚐 Meet & Greet', tempo:'tarde', km:'—',
+    pernoite:'Las Vegas', hosp:'Fontainebleau Las Vegas',
+    obs:'Airport Meet & Greet + Transfer In executivo até o hotel, com briefing de boas-vindas no trajeto.' },
+  { n:2, data:'02/10', dia:'Sex', cidade:'Check-in — Fontainebleau Las Vegas', lat:36.1372, lng:-115.1552,
+    tipo:'hotelvegas', tagTxt:'Hotel', tagCls:'t-hotel', modal:'🏨 Hospedagem Premium', tempo:'fim de tarde', km:'~15 min do LAS',
+    pernoite:'Las Vegas (1ª de 3 noites)', hosp:'Fontainebleau Las Vegas',
+    obs:'Hospedagem premium recomendada. Alternativas: Wynn · ARIA · Encore · Crockfords. Tempo livre para descanso.' },
+  { n:3, data:'02/10', dia:'Sex', cidade:'Welcome Dinner — Ocean Prime', lat:36.1077, lng:-115.1719,
+    tipo:'hotelmeio', tagTxt:'Gastronomia', tagCls:'t-hotelmeio', modal:'🍽 Welcome Dinner', tempo:'noite', km:'~10 min do hotel',
+    pernoite:'Las Vegas', hosp:'Fontainebleau Las Vegas',
+    obs:'Jantar de boas-vindas e integração do grupo. Alternativas: Carbone · Delilah · SW Steakhouse.' },
+  { n:4, data:'03/10', dia:'Sáb', cidade:'Desert Off-Road Experience', lat:36.3067, lng:-114.9640,
+    tipo:'motorhome', tagTxt:'Experiência', tagCls:'t-rv', modal:'🏜 UTV Off-Road', tempo:'manhã/tarde', km:'~35 min do hotel',
+    pernoite:'Las Vegas', hosp:'Fontainebleau Las Vegas',
+    obs:'Signature Experience: UTVs pelo deserto de Nevada, conectada ao universo automotivo. Alternativas: Sphere · Exotics Racing · Shelby American · Highlights Tour.' },
+  { n:5, data:'03/10', dia:'Sáb', cidade:'Las Vegas Night Flight 🚁', lat:36.0755, lng:-115.1673,
+    tipo:'motorhome', tagTxt:'Experiência', tagCls:'t-rv', modal:'🚁 Helicóptero', tempo:'anoitecer', km:'~15 min do hotel',
+    pernoite:'Las Vegas', hosp:'Fontainebleau Las Vegas',
+    obs:'Sobrevoo panorâmico de helicóptero pela Strip iluminada — embarque em heliporto próximo ao aeroporto.' },
+  { n:6, data:'03/10', dia:'Sáb', cidade:'"O" — Cirque du Soleil (Bellagio)', lat:36.1126, lng:-115.1767,
+    tipo:'motorhome', tagTxt:'Experiência', tagCls:'t-rv', modal:'🎭 Espetáculo', tempo:'noite', km:'~10 min do hotel',
+    pernoite:'Las Vegas', hosp:'Fontainebleau Las Vegas',
+    obs:'Espetáculo premium no teatro aquático do Bellagio. Alternativas: KÀ · Mystère · Mad Apple.' },
+  { n:7, data:'04/10', dia:'Dom', cidade:'NASCAR Race Day — Las Vegas Motor Speedway', lat:36.2724, lng:-115.0107,
+    tipo:'orlando', tagTxt:'Race Day', tagCls:'t-orlando', modal:'🏁 NASCAR Playoffs', tempo:'dia inteiro', km:'~30 min do hotel',
+    pernoite:'Las Vegas', hosp:'Fontainebleau Las Vegas',
+    obs:'Briefing + transfers Hotel ⇄ Speedway + concierge dedicado + acompanhamento operacional + coordenação do retorno. Camarote e ingressos: PneuStore.' },
+  { n:8, data:'04/10', dia:'Dom', cidade:'Beyond the Finish Line — Barry\'s Downtown Prime', lat:36.1719, lng:-115.1466,
+    tipo:'hotelmeio', tagTxt:'Gastronomia', tagCls:'t-hotelmeio', modal:'🍷 Jantar de encerramento', tempo:'noite', km:'~20 min do Speedway',
+    pernoite:'Las Vegas', hosp:'Fontainebleau Las Vegas',
+    obs:'Jantar premium pós-corrida no Circa Resort (Downtown). Alternativas: Carbone · Ocean Prime · Delilah.' },
+  { n:9, data:'04/10', dia:'Dom', cidade:'Hidden Vegas — The Laundry Room (Speakeasy)', lat:36.1666, lng:-115.1394,
+    tipo:'hotelmeio', tagTxt:'Noite', tagCls:'t-hotelmeio', modal:'🍸 Speakeasy', tempo:'noite', km:'a pé (Fremont East)',
+    pernoite:'Las Vegas', hosp:'Fontainebleau Las Vegas',
+    obs:'Encerramento da noite em speakeasy exclusivo dentro do Commonwealth. Alternativas: The Vault · Easy\'s.' },
+  { n:10, data:'05/10', dia:'Seg', cidade:'Transfer Out — Harry Reid Intl. (LAS)', lat:36.0840, lng:-115.1537, semMarcador:true,
+    tipo:'aereo', tagTxt:'Partida', tagCls:'t-aereo', modal:'🚐→✈️ Transfer Out', tempo:'conforme voos', km:'~20 min do hotel',
+    pernoite:'—', hosp:'—',
+    obs:'Check-out, transfer executivo ao aeroporto e apoio da equipe até o check-in. Fim da experiência.' },
+];
+
+/* ============ MAPA ============ */
+const map = L.map('map', { scrollWheelZoom:true });
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+  attribution:'&copy; OpenStreetMap &copy; CARTO · VTurismo', maxZoom:19
+}).addTo(map);
+
+const layer = L.layerGroup().addTo(map);
+
+function icone(num, cor){
+  return L.divIcon({ className:'',
+    html:`<div class="marker-num" style="background:${cor}">${num}</div>`,
+    iconSize:[26,26], iconAnchor:[13,13], popupAnchor:[0,-14] });
+}
+
+let gBounds = null;
+function render(){
+  layer.clearLayers();
+  const bounds = [];
+
+  pontos.forEach(p=>{
+    bounds.push([p.lat,p.lng]);
+    if(p.semMarcador) return;
+    const cor = cores[p.tipo];
+    L.marker([p.lat,p.lng], { icon:icone(p.n,cor) }).addTo(layer)
+      .bindPopup(`
+        <div class="pop">
+          <b>${p.cidade}</b><br>
+          <small>📅 ${p.data} · ${p.dia} · ${p.tempo}</small><br>
+          <small>🛏️ Pernoite: ${p.pernoite}</small>
+          ${p.km!=='—'?`<br><small>🚐 Transfer: ${p.km}</small>`:''}
+          <hr style="margin:6px 0;border:none;border-top:1px solid #e6ebe7">
+          <small>${p.obs}</small><br>
+          <a href="#" class="pop-link" onclick="openDesc(${p.n});return false;">ℹ️ Saiba mais sobre este momento</a>
+        </div>`);
+  });
+
+  /* linha do transporte executivo, na ordem da programação (volta ao aeroporto no fim) */
+  const rota = pontos.map(p=>[p.lat,p.lng]);
+  L.polyline(rota, { color:cores.motorhome, weight:4, opacity:.85, dashArray:'1,9', lineCap:'round' })
+    .addTo(layer).bindPopup('🚐 Transporte executivo — todos os deslocamentos da programação (Meet & Greet, transfers, Race Day e Transfer Out)');
+
+  gBounds = bounds;
+  map.fitBounds(bounds, { padding:[40,40], maxZoom:13 });
+
+  document.getElementById('verResumo').innerHTML =
+    '<b>NASCAR Weekend PneuStore.</b> Base única no <b>Fontainebleau Las Vegas</b> (3 noites, 02→05/10). Sex: chegada + Welcome Dinner (Ocean Prime). Sáb: Desert Off-Road + Night Flight 🚁 + "O" Cirque du Soleil. Dom: <b>NASCAR Race Day</b> no Las Vegas Motor Speedway + Beyond the Finish Line + Speakeasy. Seg: Transfer Out. Transporte executivo e concierge durante toda a experiência.';
+  document.getElementById('tabTitulo').textContent =
+    'Programação completa — NASCAR Weekend (02 a 05/10/2026)';
+
+  const tbody = document.querySelector('#roteiro tbody');
+  tbody.innerHTML='';
+  pontos.forEach(p=>{
+    const tr = document.createElement('tr');
+    if(p.tipo==='orlando') tr.className='linha-orlando';
+    tr.innerHTML = `
+      <td><strong>${p.n}</strong></td>
+      <td>${p.data}</td>
+      <td>${p.dia}</td>
+      <td><a href="#" class="cell-link" onclick="openDesc(${p.n});return false;">${p.cidade}</a></td>
+      <td><span class="tag ${p.tagCls}">${p.tagTxt}</span><br><small>${p.modal}</small></td>
+      <td>${p.tempo}</td>
+      <td>${p.km}</td>
+      <td>${p.pernoite}</td>
+      <td>${p.obs}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+(function(){
+  const url = window.location.href.split('#')[0];
+  const msg = 'Proposta CB00 Marketing — PneuStore · NASCAR Weekend Las Vegas 2026 (02–05/10, 17 convidados + 2 staff): hospedagem premium, experiências signature e operação completa do Race Day. Apresentação interativa: ' + url;
+  document.getElementById('waShare').href = 'https://wa.me/?text=' + encodeURIComponent(msg);
+  const msgP = 'Olá! Queremos AVANÇAR com a experiência CB00 — PneuStore · NASCAR Weekend Las Vegas 2026 (02 a 05/10/2026). Podem consolidar a proposta comercial? Apresentação: ' + url;
+  document.getElementById('waProposta').href = 'https://wa.me/?text=' + encodeURIComponent(msgP);
+})();
+
+render();
+
+/* re-ajusta o mapa quando o layout estabiliza (evita zoom errado em painéis/iframes) */
+window.addEventListener('load', ()=>{ setTimeout(()=>{
+  map.invalidateSize();
+  if(gBounds) map.fitBounds(gBounds, { padding:[40,40], maxZoom:13 });
+}, 250); });
+window.addEventListener('resize', ()=>{ map.invalidateSize(); });
+</script>
+</body>
+</html>
