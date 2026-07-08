@@ -9,7 +9,7 @@
 <style>
   :root{
     /* CB00 Marketing (preto carbono + prata) · marca SpeedMax: acento roxo #4E008E + energia laranja #FF6633 */
-    --vt-teal-d:#0B0C0E; --vt-teal-d2:#000000; --vt-teal:#4E008E; --vt-teal-l:#9EA6AB;
+    --vt-teal-d:#4E008E; --vt-teal-d2:#2C0056; --vt-teal:#7A2CC4; --vt-teal-l:#C6B3E0;
     --vt-cream:#F4F4F5; --vt-cream2:#E0E2E4;
     --aereo:#7F8C8D; --hotelvegas:#C9912E; --motorhome:#4E008E; --hotelmeio:#2E86AB; --orlando:#FF6633;
     --ink:#1f2933; --bg:#f4f4f5;
@@ -17,8 +17,8 @@
   *{box-sizing:border-box;}
   body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);background:var(--bg);}
 
-  header{background:linear-gradient(135deg,#1A1C1F,var(--vt-teal-d2));color:#fff;padding:20px 26px 32px;border-bottom:0;position:relative;}
-  header::after{content:"";position:absolute;left:0;right:0;bottom:0;height:12px;background:repeating-conic-gradient(#0B0C0E 0% 25%, #fff 0% 50%) 0 0/12px 12px;}
+  header{background:linear-gradient(135deg,#5E17A3,var(--vt-teal-d2));color:#fff;padding:20px 26px 32px;border-bottom:0;position:relative;}
+  header::after{content:"";position:absolute;left:0;right:0;bottom:0;height:12px;background:repeating-conic-gradient(#2C0056 0% 25%, #FF6633 0% 50%) 0 0/12px 12px;}
   .head-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:18px;}
   .head-logo{flex-shrink:0;width:210px;height:auto;}
   .head-txt h1{margin:0 0 5px;font-size:20px;letter-spacing:.2px;}
@@ -58,7 +58,7 @@
   .proposta-head{background:linear-gradient(135deg,var(--vt-teal-d),var(--vt-teal-d2));color:#fff;padding:18px 22px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;}
   .proposta-head h3{margin:0;font-size:19px;}
   .proposta-head p{margin:4px 0 0;font-size:12.5px;color:var(--vt-teal-l);}
-  .proposta-head .pp-selo{background:var(--vt-teal-l);color:#06231f;font-size:11px;font-weight:800;letter-spacing:1px;padding:5px 12px;border-radius:20px;text-transform:uppercase;}
+  .proposta-head .pp-selo{background:var(--vt-teal-l);color:#2C0056;font-size:11px;font-weight:800;letter-spacing:1px;padding:5px 12px;border-radius:20px;text-transform:uppercase;}
   .pp-group{padding:11px 22px 5px;font-size:11.5px;font-weight:700;color:var(--vt-teal-d);text-transform:uppercase;letter-spacing:.6px;background:var(--vt-cream);border-top:1px solid var(--vt-cream2);}
   .pp-row{display:flex;justify-content:space-between;gap:12px;padding:9px 22px;font-size:13px;border-bottom:1px solid #f0f3f1;}
   .pp-row .pp-item{color:#28332f;}
@@ -135,10 +135,10 @@
   @media(max-width:520px){ .md-galeria{grid-template-columns:1fr;} }
 
   /* ===== Lightbox / carrossel ===== */
-  .lightbox{position:fixed;inset:0;z-index:3000;background:rgba(4,20,18,.92);display:none;align-items:center;justify-content:center;}
+  .lightbox{position:fixed;inset:0;z-index:3000;background:rgba(20,4,40,.93);display:none;align-items:center;justify-content:center;}
   .lightbox.open{display:flex;}
   .lb-stage{margin:0;max-width:92vw;max-height:92vh;display:flex;flex-direction:column;align-items:center;}
-  .lb-stage img{max-width:92vw;max-height:78vh;border-radius:10px;box-shadow:0 14px 50px rgba(0,0,0,.6);object-fit:contain;background:#0b3d38;}
+  .lb-stage img{max-width:92vw;max-height:78vh;border-radius:10px;box-shadow:0 14px 50px rgba(0,0,0,.6);object-fit:contain;background:#2C0056;}
   .lb-cap{margin-top:14px;text-align:center;max-width:760px;color:#fff;}
   .lb-cap b{display:block;font-size:16px;color:#fff;}
   .lb-cap span{display:block;font-size:12.5px;color:var(--vt-teal-l);margin-top:3px;}
